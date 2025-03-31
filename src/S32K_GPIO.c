@@ -1,0 +1,54 @@
+/*
+ * S32K_GPIO.c
+ *
+ *  Created on: 31 mar. 2025
+ *      Author: Juan.Bueno
+ */
+#include "include.h"
+#include "S32K_GPIO.h"
+
+/* Define five pointer arrays to save the address of GPIOX */
+GPIO_MemMapPtr GPIOX[5] = {PTA,    PTB,   PTC,   PTD,   PTE};
+PORT_MemMapPtr PORTX[5] = {PORTA,  PORTB, PORTC, PORTD, PORTE};
+
+void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data)
+{
+
+}
+
+
+void GPIO_PinSetDir(PTXn_e ptx_n, uint8_t dir)
+{
+
+}
+
+
+void GPIO_PinWrite(PTXn_e ptx_n, uint8_t data)
+{
+
+}
+
+
+void GPIO_PinReverse(PTXn_e ptx_n)
+{
+
+}
+
+
+uint8_t GPIO_PinRead(PTXn_e ptx_n)
+{
+    uint8_t ret = 0U;
+
+    return ret;
+}
+
+
+void GPIO_PortPull(PTXn_e ptx_n,uint8_t data)
+{
+
+}
+
+void GPIO_ExtiInit(PTXn_e ptx_n, exti_cfg cfg)
+{
+
+}
