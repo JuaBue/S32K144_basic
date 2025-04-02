@@ -13,6 +13,35 @@ PORT_MemMapPtr PORTX[5] = {PORTA,  PORTB, PORTC, PORTD, PORTE};
 
 void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data)
 {
+    uint8_t ptx, ptn;
+
+    ptx = PTX(ptx_n);
+    ptn = PTn(ptx_n);
+
+    // 1. Enable port clock
+    PCC->PCCn[PCC_PORTA_INDEX + ptx] = PCC_PCCn_CGC_MASK;
+
+    // 2. Clear the previous Pin Mux Control
+    PORTX[ptx]->PCR[ptn] &= ~(uint32)PORT_PCR_MUX_MASK;
+
+    // 3. Set Pin Mux Control function to GPIO, i.e. normal IO port
+    PORTX[ptx]->PCR[ptn] |= PORT_PCR_MUX(1);
+
+    // 4. Set GPIO direction
+    if (dir) {
+        GPIOX[ptx]->PDDR |= (uint32_t)(1 << ptn);
+    }
+    else {
+        GPIOX[ptx]->PDDR &= ~(uint32_t)(1 << ptn);
+    }
+
+    // 5. Set the default port status
+    if (data) {
+        GPIOX[ptx]->PDOR |= (uint32_t)(1 << ptn);
+    }
+    else {
+        GPIOX[ptx]->PDOR &= ~(uint32_t)(1 << ptn);
+    }
 
 }
 
@@ -25,6 +54,17 @@ void GPIO_PinSetDir(PTXn_e ptx_n, uint8_t dir)
 
 void GPIO_PinWrite(PTXn_e ptx_n, uint8_t data)
 {
+    uint8_t ptx, ptn;
+
+    ptx = PTX(ptx_n);
+    ptn = PTn(ptx_n);
+
+    if (data) {
+        GPIOX[ptx]->PDOR |= (uint32_t)(1 << ptn);
+    }
+    else {
+        GPIOX[ptx]->PDOR &= ~(uint32_t)(1 << ptn);
+    }
 
 }
 
