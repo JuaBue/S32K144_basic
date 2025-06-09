@@ -83,8 +83,23 @@ uint8_t GPIO_PinRead(PTXn_e ptx_n)
 }
 
 
-void GPIO_PortPull(PTXn_e ptx_n,uint8_t data)
+void GPIO_PortPull(PTXn_e ptx_n, bool pullup_ena)
 {
+    uint8_t ptx, ptn;
+
+    ptx = PTX(ptx_n);
+    ptn = PTn(ptx_n);
+
+    /* Configuring Port Functions */
+    PORTX[ptx]->PCR[ptn] |= PORT_PCR_MUX(1);
+
+    /* Enable or disable the pull-up */
+    if (pullup_ena) {
+        PORTX[ptx]->PCR[ptn] |= PORT_PCR_PE_MASK;
+    }
+    else {
+        PORTX[ptx]->PCR[ptn] &= ~PORT_PCR_PE_MASK;
+    }
 
 }
 

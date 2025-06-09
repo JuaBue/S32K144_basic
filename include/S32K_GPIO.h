@@ -95,9 +95,9 @@ uint8_t GPIO_PinRead(PTXn_e ptx_n);
 
 /* @brief IO pull-up
  * @param ptx_n select port
- * @param data 0: pulldown 1: pullup
+ * @param pullup_ena false: pulldown, true: pullup
  */
-void GPIO_PortPull(PTXn_e ptx_n,uint8_t data);
+void GPIO_PortPull(PTXn_e ptx_n, bool pullup_ena);
 
 
 /* @brief GPIO external interrupt initialization
