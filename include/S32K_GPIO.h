@@ -68,9 +68,9 @@ void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data);
 
 /* @brief Set IO direction
  * @param ptx_n: pin number defined in common.h
- * @param dir: GPIO direction 1: output 0: input
+ * @param input: GPIO direction true: input false: output
  */
-void GPIO_PinSetDir(PTXn_e ptx_n, uint8_t dir);
+void GPIO_PinSetDir(PTXn_e ptx_n, bool input);
 
 
 /* @brief Set IO port output

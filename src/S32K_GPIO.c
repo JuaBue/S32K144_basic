@@ -46,8 +46,20 @@ void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data)
 }
 
 
-void GPIO_PinSetDir(PTXn_e ptx_n, uint8_t dir)
+void GPIO_PinSetDir(PTXn_e ptx_n, bool input)
 {
+    uint8_t ptx, ptn;
+
+    ptx = PTX(ptx_n);
+    ptn = PTn(ptx_n);
+
+    /* Set GPIO dir */
+    if (input) {
+        GPIOX[ptx]->PDDR |= (uint32_t)(1 << ptn);
+    }
+    else {
+        GPIOX[ptx]->PDDR &= ~(uint32_t)(1 << ptn);
+    }
 
 }
 
@@ -71,15 +83,25 @@ void GPIO_PinWrite(PTXn_e ptx_n, uint8_t data)
 
 void GPIO_PinReverse(PTXn_e ptx_n)
 {
+    uint8_t ptx,ptn;
 
+    ptx = PTX(ptx_n);
+    ptn = PTn(ptx_n);
+
+    /* Toggle output register */
+    GPIOX[ptx]->PTOR ^= (1<<ptn);
 }
 
 
 uint8_t GPIO_PinRead(PTXn_e ptx_n)
 {
-    uint8_t ret = 0U;
+    uint8_t ptx, ptn;
 
-    return ret;
+    ptx = PTX(ptx_n);
+    ptn = PTn(ptx_n);
+
+    /* Read the PDIR register */
+    return ((GPIOX[ptx]->PDIR >> ptn) & 0x1);
 }
 
 
