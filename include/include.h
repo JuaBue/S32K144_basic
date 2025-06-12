@@ -16,5 +16,11 @@
 #include "S32K144_features.h"
 #include "S32K144.h"
 
+#include "S32K_PLL.h"
+#include "S32K_UART.h"
+#include "S32K_GPIO.h"
+
+#include "LED.h"
+
 
 #endif /* INCLUDE_H_ */

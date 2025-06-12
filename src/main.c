@@ -3,10 +3,7 @@
  *
  */
 #include "include.h"
-#include "common.h"
-#include "S32K_PLL.h"
-#include "S32K_UART.h"
-#include "S32K_GPIO.h"
+
 
 #if defined (__ghs__)
     #define __INTERRUPT_SVC  __interrupt
@@ -22,29 +19,14 @@
     #define __NO_RETURN
 #endif
 
-int main(void) {
-    uint16_t count = 0U;
-
+int main(void)
+{
     SPLL_Init(PLL160);
     UART_Init(LPUART0, 115200);
-    GPIO_PinInit(PTA11,GPO,0);
-    GPIO_PinInit(PTA12,GPO,0);
 
     printf("This is my first test with S32K144\r\n");
 
-    while(1) {
-        printf("test printf times=%d\r\n",count);
-        GPIO_PinWrite(PTA11,  0);
-        GPIO_PinWrite(PTA12,  0);
-        for(int i=0; i<0xFFFF; i++) {
-          for(int j=0; j<0xFF; j++) {
-            asm("nop");
-          }
-        }
-        GPIO_PinWrite(PTA11,  1);
-        GPIO_PinWrite(PTA12,  1);
-        count++;
-    }
+    Test_LED();
 
     return 0;
 }
