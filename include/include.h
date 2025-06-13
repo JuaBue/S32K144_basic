@@ -21,6 +21,7 @@
 #include "S32K_GPIO.h"
 
 #include "LED.h"
+#include "KEY.h"
 
 
 #endif /* INCLUDE_H_ */

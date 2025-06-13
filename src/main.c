@@ -26,7 +26,7 @@ int main(void)
 
     printf("This is my first test with S32K144\r\n");
 
-    Test_LED();
+    Test_KEY();
 
     return 0;
 }
