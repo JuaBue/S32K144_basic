@@ -6,8 +6,6 @@
  */
 
 #include "include.h"
-#include "LED.h"
-#include "S32K_GPIO.h"
 
 static void led_delayms(int ms);
 
@@ -118,6 +116,7 @@ void Test_LED(void)
     uint8_t index = 0U;
 
     LED_Init();
+
     while(1)
     {
         for (index = 1U; index <= MAX_LED; index++) {
