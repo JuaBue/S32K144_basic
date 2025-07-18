@@ -16,6 +16,10 @@
 #define KEY_NOPRESS                    1U
 #define KEY_PRESS                      0U
 
+#define NUM_PI_BITS                    4U // S32K144 has 4 bits for priority
+#define PREEM_PI_VALUE                 1U
+#define SUB_PI_VALUE                   2U
+
 static void key_delayms(int ms);
 
 void KEY_Init(void)
@@ -91,9 +95,48 @@ void Test_KEY(void)
 
 }
 
-void DSW_Init(void)
+void Test_KEYint(void)
 {
+    LED_Init();
+    uint32_t priority;
+    uint32_t priorityGroup;
+    uint32_t preemptPriority = PREEM_PI_VALUE;
+    uint32_t preemptPriorityBits;
+    uint32_t subPriority = SUB_PI_VALUE;
+    uint32_t subPriorityBits;
 
+    /* Configuration button interrupt with "Falling edge triggered, internal pull-up" */
+    GPIO_ExtiInit(KEYA_IO, falling_up);
+    GPIO_ExtiInit(KEYB_IO, falling_up);
+    GPIO_ExtiInit(KEYC_IO, falling_up);
+
+    /* Priority Configuration:  */
+    priorityGroup = ((S32_SCB->AIRCR & S32_SCB_AIRCR_PRIGROUP_MASK) >> S32_SCB_AIRCR_PRIGROUP_SHIFT);
+
+    /* Maximum value for PRIGROUP */
+    if (priorityGroup > NUM_PI_BITS) {
+        priorityGroup = NUM_PI_BITS;
+    }
+
+    /* Set the number of bits for every field */
+    preemptPriorityBits = priorityGroup;
+    subPriorityBits = NUM_PI_BITS - priorityGroup;
+
+    /* Set mask to avoid overload */
+    preemptPriority &= ((1U << preemptPriorityBits) - 1U);
+    subPriority &= ((1U << subPriorityBits) - 1U);
+
+    /* Encode priority */
+    priority = (preemptPriority << subPriorityBits) | subPriority;
+
+    /* Set Priority for device specific Interrupts */
+    S32_NVIC->IP[(uint32_t)PORTD_IRQn] = ((priority << (8U - NUM_PI_BITS)) & 0xFF);
+
+    /* Enable interrupt for PORTD_IRQn */
+    S32_NVIC->ISER[(uint32_t)(PORTD_IRQn) >> 5] = (1U << ((uint32_t)(PORTD_IRQn) & 0x1F));
+
+    /* Infinite loop */
+    while(1);
 }
 
 /* TODO: replace this way to set delay for a timer. */

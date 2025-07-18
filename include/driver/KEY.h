@@ -48,5 +48,10 @@ KeyStatus_types KEY_Read(Mode_types mode, Key_types key);
  */
 void Test_KEY(void);
 
+/*
+ * @brief: Key Test with interrupt
+ */
+void Test_KEYint(void);
+
 
 #endif /* DRIVER_KEY_H_ */
