@@ -49,6 +49,7 @@
 //==============================================================================
 //                                INCLUDES
 //==============================================================================
+#include "FTM.h"
 
 //==============================================================================
 //                         LOCAL DEFINES AND MACROS
@@ -73,6 +74,36 @@
 //==============================================================================
 //                       PUBLIC FUNCTION DEFINITIONS
 //==============================================================================
+
+void FTM0_init(void)
+{
+    /* Ensure clk disabled for the configuration */
+    PCC->PCCn[PCC_FTM0_INDEX] &= ~PCC_PCCn_CGC_MASK;
+    /* Clock Src = 1, 8 MHz SOSCDIV1_CLK and Enable clock for FTM regs */
+    PCC->PCCn[PCC_FTM0_INDEX] |= (PCC_PCCn_PCS(0x01) | PCC_PCCn_CGC_MASK);
+
+    /* Write protect to registers diabled (default) */
+    FTM0->MODE |= FTM_MODE_WPDIS_MASK;
+    /* Channel 0 PWM enable bit = 1 Output port is enable
+     * Channel 1 PWM enable bit = 1 Output port is enable
+     * Channel 2-7 PWM enable bit = 0 Output port are disable
+     * TOIE (Timer Overflow Interrupt Enable) = 0 Disable
+     * CPWMS (Center aligned PWM Select) = 0 Up counting mode
+     * CLKS (Clock source) = 0 No clock selected -> FTM disabled
+     * PS (Prescaler factor) = 0. Prescaler = 1 */
+    FTM0->SC = (FTM_SC_PWMEN0_MASK | FTM_SC_PWMEN1_MASK);
+    /* FTM mode settings used: DECAPENx, MCOMBINEx, COMBINEx=0 */
+    FTM0->COMBINE = 0x00000000;
+    /* Polarity for all channels is active high (default) */
+    FTM0->POL = 0x00000000;
+    /* FTM0 counter final value (used for PWM mode)
+     * FTM0 Period = MOD_CNTIN+0x0001
+     * 8MHz / 1 = 8MHz ticks -> 1280Hz */
+    FTM0->MOD = FTM0_COUNT_NUM - 1;
+
+
+
+}
 
 //==============================================================================
 //                       STATIC FUNCTION DEFINITIONS
