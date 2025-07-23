@@ -183,3 +183,14 @@ void SCG_Init(void)
 
   SMC->PMCTRL  = SMC_PMCTRL_RUNM(0);    //enter RUN
 }
+
+
+void NormalRUNmode_80MHz(void)
+{
+    SCG->RCCR = SCG_RCCR_SCS(6)     /* PLL as clock source */
+        | SCG_RCCR_DIVCORE(0x01)    /* DIVCORE=1, div. by 2: Core clock = 160/2 MHz = 80 MHz */
+        | SCG_RCCR_DIVBUS(0x01)     /* DIVBUS=1, div. by 2: bus clock = 40MHz */
+        | SCG_RCCR_DIVSLOW(0x02);   /* DIVSLOW=2, div. by 2: SCG slow, flash clock= 26 2/3 MHz */
+    /* Wait for sys clk src = SPLL */
+    while (((SCG->CSR & SCG_CSR_SCS_MASK) >> SCG_CSR_SCS_SHIFT) != 6);
+}
