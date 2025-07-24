@@ -1,13 +1,52 @@
 /*
- * KEY.c
+ * =============================================================================
+ * File Name    : KEY.c
+ * Project      : S32K144_basic
+ * Module       : Key Input Module (Header)
+ * Author       : JuaBue
+ * Created On   : 2025-06-12
+ * Version      : 1.0.0
  *
- *  Created on: 12 jun. 2025
- *      Author: Usuario
+ * Description  :
+ *   This header file provides the necessary definitions and function prototypes
+ *   for handling key/button inputs on the S32K144. It supports two operation modes:
+ *     - MODE_CONT   : Continuous detection while key is pressed
+ *     - MODE_NOCONT : One-time detection per key press (edge-triggered)
+ *
+ *   Key definitions:
+ *     - KEYA_IO : PTD2
+ *     - KEYB_IO : PTD4
+ *     - KEYC_IO : PTD3
+ *
+ * Dependencies :
+ *   - GPIO driver
+ *
+ * Configuration :
+ *   - Active-low keys with internal or external pull-up resistors
+ *
+ * License :
+ *   This file is part of a free software project released under the terms of
+ *   the GNU General Public License version 3 (GPLv3).
+ *
+ *   You are free to use, modify, and distribute this file under the conditions
+ *   of the GPLv3, as long as you retain this header and provide proper
+ *   attribution to the original author.
+ *
+ *   See <https://www.gnu.org/licenses/gpl-3.0.html> for the full license text.
+ *
+ *   Copyright (c) 2025 Juan I. Bueno
+ *   All rights reserved.
+ *
+ * =============================================================================
  */
+//==============================================================================
+//                                INCLUDES
+//==============================================================================
+#include "KEY.h"
 
-#include "include.h"
-
-
+//==============================================================================
+//                         LOCAL DEFINES AND MACROS
+//==============================================================================
 /* Button pin definitions */
 #define KEYA_IO                        PTD2
 #define KEYB_IO                        PTD4
@@ -20,8 +59,26 @@
 #define PREEM_PI_VALUE                 1U
 #define SUB_PI_VALUE                   2U
 
+//==============================================================================
+//                       LOCAL TYPES AND ENUMERATIONS
+//==============================================================================
+
+//==============================================================================
+//                           GLOBAL VARIABLES
+//==============================================================================
+
+//==============================================================================
+//                          STATIC VARIABLES
+//==============================================================================
+
+//==============================================================================
+//                      STATIC FUNCTION DECLARATIONS
+//==============================================================================
 static void key_delayms(int ms);
 
+//==============================================================================
+//                       PUBLIC FUNCTION DEFINITIONS
+//==============================================================================
 void KEY_Init(void)
 {
     GPIO_PinInit(KEYA_IO, GPI, 1);
@@ -75,9 +132,11 @@ KeyStatus_types KEY_Read(Mode_types mode, Key_types key)
 
 void Test_KEY(void)
 {
+    uint8_t index = 1U;
+
+    /* Initialize LED and KET module */
     LED_Init();
     KEY_Init();
-    uint8_t index = 1U;
 
     while(1)
     {
@@ -97,13 +156,15 @@ void Test_KEY(void)
 
 void Test_KEYint(void)
 {
-    LED_Init();
     uint32_t priority;
     uint32_t priorityGroup;
     uint32_t preemptPriority = PREEM_PI_VALUE;
     uint32_t preemptPriorityBits;
     uint32_t subPriority = SUB_PI_VALUE;
     uint32_t subPriorityBits;
+
+    /* Initialize LED module */
+    LED_Init();
 
     /* Configuration button interrupt with "Falling edge triggered, internal pull-up" */
     GPIO_ExtiInit(KEYA_IO, falling_up);
@@ -139,6 +200,9 @@ void Test_KEYint(void)
     while(1);
 }
 
+//==============================================================================
+//                       STATIC FUNCTION DEFINITIONS
+//==============================================================================
 /* TODO: replace this way to set delay for a timer. */
 static void key_delayms(int ms)
 {
