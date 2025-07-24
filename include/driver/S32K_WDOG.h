@@ -1,15 +1,27 @@
 /*
  * =============================================================================
- * File Name    : include.h
+ * File Name    : S32K_WDOG.h
  * Project      : S32K144_basic
- * Module       :
+ * Module       : Watchdog Timer (WDOG)
  * Author       : JuaBue
- * Created On   : 2025-03-13>
+ * Created On   : 2025-07-21
  * Version      : 1.0.0
  *
  * Description  :
- *   This header file includes all the necessary header files for the project.
- *   It serves as a central point to manage includes in the project.
+ *   This module provides initialization, configuration, and refresh handling
+ *   for the Watchdog Timer (WDOG) peripheral of the NXP S32K144 microcontroller.
+ *   It allows enabling, disabling, and servicing the WDOG in bare-metal
+ *   environments without using SDK or CMSIS.
+ *
+ * Dependencies :
+ *   - S32K144 device memory map (WDOG base address: 0x40052000)
+ *   - Core system clock for prescaler calculations
+ *
+ * Configuration :
+ *   - WDOG_ENABLE           : Enable or disable the watchdog (macro or function call)
+ *   - WDOG_TIMEOUT_MS       : Timeout value in milliseconds (uint16_t range)
+ *   - WDOG_USE_PRESCALER    : Use prescaler ÷256 to extend timeout range
+ *   - WDOG_LPO_CLOCK_KHZ    : Expected LPO frequency in kHz (typically 1 kHz)
  *
  * License :
  *   This file is part of a free software project released under the terms of
@@ -26,29 +38,13 @@
  *
  * =============================================================================
  */
-#ifndef INCLUDE_H_
-#define INCLUDE_H_
+
+#ifndef DRIVER_S32K_WDOG_H_
+#define DRIVER_S32K_WDOG_H_
 
 //==============================================================================
 //                               INCLUDES
 //==============================================================================
-#include "common.h"
-#include "stdio.h"
-#include "math.h"
-#include "stdlib.h"
-
-#include "S32K144_features.h"
-#include "S32K144.h"
-
-#include "S32K_PLL.h"
-#include "S32K_UART.h"
-#include "S32K_GPIO.h"
-#include "S32K_SYSTICK.h"
-#include "S32K_WDOG.h"
-
-#include "LED.h"
-#include "KEY.h"
-#include "BUZZ.h"
 
 //==============================================================================
 //                         PUBLIC DEFINES AND MACROS
@@ -66,4 +62,32 @@
 //                        PUBLIC FUNCTION DECLARATIONS
 //==============================================================================
 
-#endif /* INCLUDE_H_ */
+/*
+ * @brief Disable watchdog
+ */
+void WDOG_Disable(void);
+
+/*
+ * @brief Unlock watchdog
+ */
+void WDOG_Unlock(void);
+
+/*
+ * @brief: Enable once the watchdog
+ * @param: TM: Timeout period, value range im ms [2,130]
+ */
+void WDOG_EnableOnce(uint16_t TM);
+
+/*
+ * @brief: Enable watchdog
+ * @param: TM: Timeout period, value range im ms [2,130]
+ */
+void WDOG_Enable(uint16_t TM);
+
+/*
+ * @brief Refresh watchdog
+ */
+void WDOG_Refresh(void);
+
+
+#endif /* DRIVER_S32K_WDOG_H_ */

@@ -1,15 +1,21 @@
 /*
  * =============================================================================
- * File Name    : include.h
+ * File Name    : S32K_SYSTICK.h
  * Project      : S32K144_basic
- * Module       :
+ * Module       : SysTick Driver
  * Author       : JuaBue
- * Created On   : 2025-03-13>
+ * Created On   : 2025-07-21
  * Version      : 1.0.0
  *
  * Description  :
- *   This header file includes all the necessary header files for the project.
- *   It serves as a central point to manage includes in the project.
+ *   Provides initialization and basic control of the SysTick timer.
+ *   Intended for use as a system time base (e.g., 1ms tick).
+ *
+ * Dependencies :
+ *   - None
+ *
+ * Configuration :
+ *   - SYS_TICK_FREQUENCY_HZ
  *
  * License :
  *   This file is part of a free software project released under the terms of
@@ -26,44 +32,56 @@
  *
  * =============================================================================
  */
-#ifndef INCLUDE_H_
-#define INCLUDE_H_
+
+#ifndef DRIVER_S32K_SYSTICK_H_
+#define DRIVER_S32K_SYSTICK_H_
 
 //==============================================================================
 //                               INCLUDES
 //==============================================================================
-#include "common.h"
-#include "stdio.h"
-#include "math.h"
-#include "stdlib.h"
-
-#include "S32K144_features.h"
-#include "S32K144.h"
-
-#include "S32K_PLL.h"
-#include "S32K_UART.h"
-#include "S32K_GPIO.h"
-#include "S32K_SYSTICK.h"
-#include "S32K_WDOG.h"
-
-#include "LED.h"
-#include "KEY.h"
-#include "BUZZ.h"
 
 //==============================================================================
 //                         PUBLIC DEFINES AND MACROS
 //==============================================================================
+#define delay(X)                    systime_delay_ms(X)
 
 //==============================================================================
 //                        PUBLIC TYPES AND ENUMERATIONS
 //==============================================================================
+typedef struct {
+    void (* init) (void);
+    uint64_t (* get_time_us) (void);
+    uint32_t (* get_time_ms) (void);
+    void (* delay_us) (uint32_t);
+    void (* delay_ms) (uint32_t);
+} systime_t;
+
 
 //==============================================================================
 //                         PUBLIC GLOBAL VARIABLES
 //==============================================================================
+extern systime_t  systime;
+
 
 //==============================================================================
 //                        PUBLIC FUNCTION DECLARATIONS
 //==============================================================================
 
-#endif /* INCLUDE_H_ */
+/*
+ * @brief Initialize the systime
+ */
+void systime_init(void);
+
+/*
+ * @brief: Set the delay time in us
+ * @param: us: delay time in us
+ */
+void systime_delay_us(uint32_t us);
+
+/*
+ * @brief: Set the delay time in ms
+ * @param: ms: delay time in ms
+ */
+void systime_delay_ms(uint32_t ms);
+
+#endif /* DRIVER_S32K_SYSTICK_H_ */

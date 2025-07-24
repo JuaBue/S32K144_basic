@@ -52,4 +52,9 @@ void SPLL_Init(clk_option opt);
  */
 void SCG_Init(void);
 
+/*
+ * @brief: Change to normal RUN mode with 8MHz SOSC, 80 MHz PLL
+ */
+void NormalRUNmode_80MHz(void);
+
 #endif /* S32K_PLL_H_ */
