@@ -47,11 +47,11 @@ void PORTD_IRQHandler()
     /* PTD2 */
     if (temp & (1 << 2)) {
         LED_Reverse(3);
-        LED_Reverse(4);
     }
     /* PTD3 */
     else if (temp & (1 << 3)) {
         LED_Reverse(6);
+        LED_Reverse(4);
     }
     /* PTD4 */
     else if (temp & (1 << 4)) {
@@ -64,14 +64,30 @@ void PORTD_IRQHandler()
 
 int main(void)
 {
+    DisableInterrupts;
     SPLL_Init(PLL160);
     UART_Init(LPUART0, 115200);
+    NormalRUNmode_80MHz();
 
-    printf("This is my first test with S32K144\r\n");
+    BUZZ_Init();
+    systime.init();
 
     setPriorityGroup(NVIC_Group2);
 
-    Test_KEYint();
+    printf("---------------------------------------------\n");
+    printf("| Test of basic funtionalities with S32K144 |\n");
+    printf("---------------------------------------------\n");
+    EnableInterrupts;
+
+
+    /* Initial example to check the notes */
+    BUZZ_playNote('C', 150);
+    delay(1000);
+    BUZZ_playNote('E', 150);
+    delay(1000);
+
+    /* Play the song */
+    BUZZ_MainTask();
 
     return 0;
 }
