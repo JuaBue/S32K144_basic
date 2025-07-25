@@ -5,7 +5,6 @@
  * Module       : Buzz Module
  * Author       : JuaBue
  * Created On   : 2025-07-23
- * Last Updated : 2025-07-23
  * Version      : 1.0.0
  *
  * Description  :
