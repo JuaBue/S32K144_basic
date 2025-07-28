@@ -1,16 +1,74 @@
 /*
- * S32K_PLL.c
+ * =============================================================================
+ * File Name    : S32K_PLL.c
+ * Project      : S32K144_basic
+ * Module       : Clock & PLL Initialization Module (Header)
+ * Author       : JuaBue
+ * Created On   : 2025-03-13
+ * Version      : 1.0.0
  *
- *  Created on: 22 mar. 2025
- *      Author: Juan.Bueno
+ * Description  :
+ *   This header file provides functions and configuration options to initialize
+ *   the system clocks on the NXP S32K144 microcontroller. It supports setting up
+ *   the System PLL (SPLL), external oscillator (XOSC), and RUN mode transitions.
+ *
+ *   Clock configuration options are defined in the `clk_option` enumeration, with
+ *   recommended and unstable values annotated.
+ *
+ *   Example values:
+ *     - PLL160: Recommended stable configuration
+ *     - PLL220: Unstable
+ *     - PLL252: Very unstable (not recommended)
+ *
+ * Dependencies :
+ *   - Device-specific SCG, SPLL, and SOSC register definitions
+ *
+ * Configuration :
+ *   - XOSC expected to operate at 8 MHz
+ *   - Default RUN mode transitions to 80 MHz using PLL
+ *
+ * License :
+ *   This file is part of a free software project released under the terms of
+ *   the GNU General Public License version 3 (GPLv3).
+ *
+ *   You are free to use, modify, and distribute this file under the conditions
+ *   of the GPLv3, as long as you retain this header and provide proper
+ *   attribution to the original author.
+ *
+ *   See <https://www.gnu.org/licenses/gpl-3.0.html> for the full license text.
+ *
+ *   Copyright (c) 2025 Juan I. Bueno
+ *   All rights reserved.
+ *
+ * =============================================================================
  */
-#include "include.h"
+//==============================================================================
+//                                INCLUDES
+//==============================================================================
 #include "S32K_PLL.h"
 
+//==============================================================================
+//                         LOCAL DEFINES AND MACROS
+//==============================================================================
+
+//==============================================================================
+//                       LOCAL TYPES AND ENUMERATIONS
+//==============================================================================
+
+//==============================================================================
+//                           GLOBAL VARIABLES
+//==============================================================================
 /* Core clock and Bus clock */
 uint32_t core_clk_M;
 uint32_t bus_clk_M;
 
+//==============================================================================
+//                          STATIC VARIABLES
+//==============================================================================
+
+//==============================================================================
+//                      STATIC FUNCTION DECLARATIONS
+//==============================================================================
 
 void MCU_Init(void)
 {
@@ -140,48 +198,48 @@ void SPLL_Init(clk_option opt)
 
 void SCG_Init(void)
 {
-  /* Enable clock for PORTX */
-  PCC->PCCn[PCC_PORTA_INDEX] = PCC_PCCn_CGC_MASK;
-  PCC->PCCn[PCC_PORTB_INDEX] = PCC_PCCn_CGC_MASK;
-  PCC->PCCn[PCC_PORTC_INDEX] = PCC_PCCn_CGC_MASK;
-  PCC->PCCn[PCC_PORTD_INDEX] = PCC_PCCn_CGC_MASK;
-  PCC->PCCn[PCC_PORTE_INDEX] = PCC_PCCn_CGC_MASK;
+    /* Enable clock for PORTX */
+    PCC->PCCn[PCC_PORTA_INDEX] = PCC_PCCn_CGC_MASK;
+    PCC->PCCn[PCC_PORTB_INDEX] = PCC_PCCn_CGC_MASK;
+    PCC->PCCn[PCC_PORTC_INDEX] = PCC_PCCn_CGC_MASK;
+    PCC->PCCn[PCC_PORTD_INDEX] = PCC_PCCn_CGC_MASK;
+    PCC->PCCn[PCC_PORTE_INDEX] = PCC_PCCn_CGC_MASK;
 
-  // *** System OSC ***
-  SCG->SOSCDIV=0x00000101;  /* SOSCDIV1 & SOSCDIV2 =1: divide by 1 */
-  SCG->SOSCCFG=0x00000034;  /* Range=3: high freq (SOSC betw 8MHz-32MHz)*/
-                            /* HGO=0:   Config xtal osc for low power */
-                            /* EREFS=1: Input is external XTAL */
-  while(SCG->SOSCCSR & SCG_SOSCCSR_LK_MASK); /* Ensure SOSCCSR unlocked */
-  SCG->SOSCCSR=0x00000001;  /* LK=0:          SOSCCSR can be written */
-                            /* SOSCCMRE=0:    OSC CLK monitor IRQ if enabled */
-                            /* SOSCCM=0:      OSC CLK monitor disabled */
-                            /* SOSCERCLKEN=0: Sys OSC 3V ERCLK output clk disabled */
-                            /* SOSCLPEN=0:    Sys OSC disabled in VLP modes */
-                            /* SOSCSTEN=0:    Sys OSC disabled in Stop modes */
-                            /* SOSCEN=1:      Enable oscillator */
-  while(!(SCG->SOSCCSR & SCG_SOSCCSR_SOSCVLD_MASK)); /* Wait for sys OSC clk valid */
+    // *** System OSC ***
+    SCG->SOSCDIV=0x00000101;    /* SOSCDIV1 & SOSCDIV2 =1: divide by 1 */
+    SCG->SOSCCFG=0x00000034;    /* Range=3: high freq (SOSC betw 8MHz-32MHz)*/
+                                /* HGO=0:   Config xtal osc for low power */
+                                /* EREFS=1: Input is external XTAL */
+    while(SCG->SOSCCSR & SCG_SOSCCSR_LK_MASK); /* Ensure SOSCCSR unlocked */
+    SCG->SOSCCSR=0x00000001;  /* LK=0:          SOSCCSR can be written */
+                                /* SOSCCMRE=0:    OSC CLK monitor IRQ if enabled */
+                                /* SOSCCM=0:      OSC CLK monitor disabled */
+                                /* SOSCERCLKEN=0: Sys OSC 3V ERCLK output clk disabled */
+                                /* SOSCLPEN=0:    Sys OSC disabled in VLP modes */
+                                /* SOSCSTEN=0:    Sys OSC disabled in Stop modes */
+                                /* SOSCEN=1:      Enable oscillator */
+    while(!(SCG->SOSCCSR & SCG_SOSCCSR_SOSCVLD_MASK)); /* Wait for sys OSC clk valid */
 
-  // *** System PLL ***
-  SCG->SPLLDIV = 0x00000101;  /* SOSCPLL1 & SPLLDIV2 =1: divide by 1 */
-  SCG->SPLLCFG = 0x00180000;  /* PREDIV=0: Divide SOSC_CLK by 0+1=1 */
-                              /* MULT=24:  Multiply sys pll by 24+16=40 */
-                              /* SPLL_CLK = 8MHz / 1 * 40 / 2 = 160 MHz */
-  while(SCG->SPLLCSR & SCG_SPLLCSR_LK_MASK); /* Ensure SPLLCSR unlocked */
-  SCG->SPLLCSR = 0x00000001; /* LK=0:        SPLLCSR can be written */
-                             /* SPLLCMRE=0:  SPLL CLK monitor IRQ if enabled */
-                             /* SPLLCM=0:    SPLL CLK monitor disabled */
-                             /* SPLLSTEN=0:  SPLL disabled in Stop modes */
-                             /* SPLLEN=1:    Enable SPLL */
-  while(!(SCG->SPLLCSR & SCG_SPLLCSR_SPLLVLD_MASK)); /* Wait for SPLL valid */
+    // *** System PLL ***
+    SCG->SPLLDIV = 0x00000101;  /* SOSCPLL1 & SPLLDIV2 =1: divide by 1 */
+    SCG->SPLLCFG = 0x00180000;  /* PREDIV=0: Divide SOSC_CLK by 0+1=1 */
+                                /* MULT=24:  Multiply sys pll by 24+16=40 */
+                                /* SPLL_CLK = 8MHz / 1 * 40 / 2 = 160 MHz */
+    while(SCG->SPLLCSR & SCG_SPLLCSR_LK_MASK); /* Ensure SPLLCSR unlocked */
+    SCG->SPLLCSR = 0x00000001; /* LK=0:        SPLLCSR can be written */
+                                /* SPLLCMRE=0:  SPLL CLK monitor IRQ if enabled */
+                                /* SPLLCM=0:    SPLL CLK monitor disabled */
+                                /* SPLLSTEN=0:  SPLL disabled in Stop modes */
+                                /* SPLLEN=1:    Enable SPLL */
+    while(!(SCG->SPLLCSR & SCG_SPLLCSR_SPLLVLD_MASK)); /* Wait for SPLL valid */
 
-  // *** MODE CONFIG ***
-  SCG->RCCR=SCG_RCCR_SCS(6)  /* PLL as clock source*/
-        |SCG_RCCR_DIVCORE(1)  /* DIVCORE= 2, Core/Sys clock = 80 MHz*/
-        |SCG_RCCR_DIVBUS(3)   /* DIVBUS = 4, bus clock = 40 MHz*/
-        |SCG_RCCR_DIVSLOW(7); /* DIVSLOW = 8, SCG slow, flash clock= 20 MHz*/
+    // *** MODE CONFIG ***
+    SCG->RCCR=SCG_RCCR_SCS(6)  /* PLL as clock source*/
+        |SCG_RCCR_DIVCORE(1)   /* DIVCORE= 2, Core/Sys clock = 80 MHz*/
+        |SCG_RCCR_DIVBUS(3)    /* DIVBUS = 4, bus clock = 40 MHz*/
+        |SCG_RCCR_DIVSLOW(7);  /* DIVSLOW = 8, SCG slow, flash clock= 20 MHz*/
 
-  SMC->PMCTRL  = SMC_PMCTRL_RUNM(0);    //enter RUN
+    SMC->PMCTRL  = SMC_PMCTRL_RUNM(0);    //enter RUN
 }
 
 

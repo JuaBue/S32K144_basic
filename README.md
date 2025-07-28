@@ -187,3 +187,41 @@ Before using this module:
 - Call `UART_PinInit(LPUARTx)` to configure the required TX/RX pins.
 - Call `UART_Init(LPUARTx, baud)` with the desired baud rate (e.g., 9600, 115200).
 - Ensure only the necessary UART MUX is active to avoid conflicts.
+
+## 6. Clock and PLL Configuration Module
+
+This module handles clock system setup for the **S32K144** microcontroller by NXP. It includes initialization routines for the System PLL (SPLL), external oscillator (XOSC), and RUN mode transitions, ensuring a stable system clock for all peripherals and core modules.
+
+### 6.0. Clock Sources
+
+- **XOSC (External Oscillator)**: 8 MHz input clock
+- **SPLL (System PLL)**: Generates system clock from XOSC
+- **RUN mode**: Can be configured for various output clock frequencies
+
+### 6.1. Features
+
+- Multiple PLL frequency options (`clk_option` enum)
+  - `PLL160` recommended for optimal performance
+  - Options like `PLL200`, `PLL220`, `PLL252` available for testing
+- Initializes key SCG (System Clock Generator) components
+- Sets up normal RUN mode with `NormalRUNmode_80MHz()`
+- Stores final system frequencies in global variables:
+  - `core_clk_M`: Core clock in MHz
+  - `bus_clk_M` : Bus clock in MHz
+
+### 6.2. Functions
+
+| Function               | Description                                                        |
+|------------------------|--------------------------------------------------------------------|
+| `MCU_Init()`           | Initializes basic CPU and system components                        |
+| `SPLL_Init(opt)`       | Initializes PLL based on selected `clk_option`                     |
+| `SCG_Init()`           | Sets up 8 MHz XOSC, 160 MHz SPLL, and RUN mode                    |
+| `NormalRUNmode_80MHz()`| Switches to RUN mode using SOSC and 80 MHz PLL                    |
+
+> ⚠️ **Note:** Ensure the external crystal is properly configured and stable before invoking PLL routines.
+
+### 6.3. Dependencies
+
+- MCU SCG and SPLL register headers
+- Correct external clock hardware setup (8 MHz crystal)
+- Clock tree stability required for UART, timers, and peripherals
