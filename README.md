@@ -103,3 +103,48 @@ Before using this module, ensure the following:
 - `MAX_LED` is set appropriately if additional LEDs are added or removed.
 
 > 🧪 You can use the `Test_LED()` function as a diagnostic routine to verify the LEDs are correctly wired and responding to commands.
+
+## 4. GPIO Control Module
+
+This module provides a flexible and complete interface for managing General Purpose Input/Output (GPIO) operations on the **S32K144** microcontroller by NXP. It enables input/output configuration, pin direction control, output toggling, and interrupt setup for all GPIO ports (PTA–PTE).
+
+### 4.0. Pin Configuration and Modes
+
+- Supports all GPIO ports: PTA, PTB, PTC, PTD, PTE
+- Each pin can be individually configured with the following options:
+  - Input (with optional pull-up/down)
+  - Output (standard or high drive, optional slew rate)
+  - Passive filter (for noisy digital input lines)
+  - Interrupt triggers (edge or level)
+
+> ⚠️ **Note:** Ensure the GPIO ports and system clock are properly initialized before calling any GPIO functions.
+
+### 4.1. Features
+
+- Direction selection: `GPI`, `GPO`, `GPO_HDS`, etc.
+- Passive input filters and pull resistor configuration
+- External interrupt support via `GPIO_ExtiInit()`
+- Output control:
+  - `GPIO_PinWrite()`
+  - `GPIO_PinReverse()`
+- Input reading:
+  - `GPIO_PinRead()`
+- Direction control:
+  - `GPIO_PinSetDir()`
+- Pull-up/pull-down control:
+  - `GPIO_PortPull()`
+
+### 4.2. Dependencies
+
+- `common.h` (for `PTXn_e` type and GPIO index macros)
+- MCU hardware headers (e.g., `PORTx`, `GPIOx` structures)
+- NVIC initialization (for interrupt use)
+
+### 4.3. Configuration
+
+Before using this module:
+
+- Include this header and ensure that `GPIOX` and `PORTX` arrays are mapped properly to their corresponding memory addresses.
+- Enable pull-up/down as needed depending on the configuration (`GPI_UP`, `GPI_DOWN`, etc.).
+- For interrupts, configure with `GPIO_ExtiInit()` and enable `NVIC_EnableIRQ()` separately.
+- Use the appropriate macros (`PTA0_OUT`, `DDRA0`, etc.) for direct bit/byte/word access where needed.

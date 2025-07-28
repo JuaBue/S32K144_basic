@@ -1,112 +1,60 @@
 /*
- * S32K_PLL.h
+ * =============================================================================
+ * File Name    : S32K_GPIO.h
+ * Project      : S32K144_basic
+ * Module       : GPIO Control Module (Header)
+ * Author       : JuaBue
+ * Created On   : 2025-03-30
+ * Version      : 1.0.0
  *
- *  Created on: 30 mar. 2025
- *      Author: Juan.Bueno
+ * Description  :
+ *   This header file provides enumerations, macros, and function declarations
+ *   for configuring and controlling GPIO ports on the NXP S32K144 microcontroller.
+ *   It supports flexible input/output settings, passive filters, pull-up/down
+ *   configurations, and interrupt trigger modes.
+ *
+ *   Main features:
+ *     - Configurable GPIO direction (input/output)
+ *     - Support for passive filters, pull-up/down resistors
+ *     - External interrupt trigger configuration (edge/level)
+ *     - Bit-level, byte-level, and word-level pin control
+ *     - Input/output direction configuration macros
+ *
+ * Dependencies :
+ *   - MCU register definitions for GPIOx and PORTx
+ *
+ * Configuration :
+ *   - Ensure that the system clock and GPIO modules are initialized prior to use
+ *
+ * License :
+ *   This file is part of a free software project released under the terms of
+ *   the GNU General Public License version 3 (GPLv3).
+ *
+ *   You are free to use, modify, and distribute this file under the conditions
+ *   of the GPLv3, as long as you retain this header and provide proper
+ *   attribution to the original author.
+ *
+ *   See <https://www.gnu.org/licenses/gpl-3.0.html> for the full license text.
+ *
+ *   Copyright (c) 2025 Juan I. Bueno
+ *   All rights reserved.
+ *
+ * =============================================================================
  */
-
 #ifndef S32K_GPIO_H_
 #define S32K_GPIO_H_
 
-// Define pin status
-typedef enum GPIO_CFG
-{
-    // The value here cannot be changed!!!
-	GPI         = 0x00,	// Define the pin input direction. In GPIOx_PDDRn, 0 means input and 1 means output.
-	GPO         = 0x01,	// Define the pin output direction
+//==============================================================================
+//                               INCLUDES
+//==============================================================================
+#include "include.h"
 
-	GPI_DOWN    = 0x02,	// Input pull-down PORTx_PCRn requires PE=1, PS=0
-	GPI_UP      = 0x03,	// Input pull-up PORTx_PCRn requires PE=1, PS=1
-	GPI_PF      = 0x10,	// Input, with passive filter, filter range: 10 MHz ~ 30 MHz. Does not support high-speed interface (>=2MHz) 0b10000           Passive Filter Enable
-	GPI_DOWN_PF = GPI_DOWN | GPI_PF ,		// Input pull-down with passive filter
-	GPI_UP_PF   = GPI_UP   | GPI_PF ,		// Input pull-up with passive filter
-
-	GPO_HDS     = 0x41,	// Output high drive strength 0b100 0001 High drive strength
-	GPO_SSR     = 0x05,	// Output slow change rate 0b101 Slow slew rate
-	GPO_HDS_SSR = GPO_HDS | GPO_SSR,	// Output high drive capability, slow change rate
-} GPIO_CFG;		// The lowest bit is 0, which means it is definitely input; the lowest bit of GPI_UP and GPI_UP_PF is 1, and the others are output
-
-
-// Define pin external interrupt trigger mode
-typedef enum exti_cfg
-{
-    rising_DMA      = 0x01,     // Rising edge triggers DMA interrupt
-    falling_DMA     = 0x02,     // Falling edge triggers DMA interrupt
-    either_down_DMA = 0x03,     // DMA interrupt triggered by edge transition
-
-    // Use the highest bit to mark pull-up and pull-down
-    zero_down       = 0x08u,    // Low level trigger, internal pull-down
-    rising_down     = 0x09u,    // Rising edge trigger, internal pull-down
-    falling_down    = 0x0Au,    // Falling edge triggered, internal pull-down
-    either_down     = 0x0Bu,    // Edge trigger, internal pull-down
-    one_down        = 0x0Cu,    // High level trigger, internal pull-down
-
-    // Use the highest bit to mark pull-up and pull-down
-    zero_up         = 0x88u,    // Low level trigger, internal pull-up
-    rising_up       = 0x89u,    // Rising edge trigger, internal pull-up
-    falling_up      = 0x8Au,    // Falling edge triggered, internal pull-up
-    either_up       = 0x8Bu,    // Edge trigger, internal pull-up
-    one_up          = 0x8Cu     // High level trigger, internal pull-up
-} exti_cfg;
-
-extern GPIO_MemMapPtr GPIOX[5];
-extern PORT_MemMapPtr PORTX[5];
+//==============================================================================
+//                         PUBLIC DEFINES AND MACROS
+//==============================================================================
 
 #define GPIOX_BASE(PTxn)    GPIOX[PTX(PTxn)] // GPIO module address
 #define PORTX_BASE(PTxn)    PORTX[PTX(PTxn)] // PORT module address
-
-
-/*********************** GPIO Function **************************/
-
-/* @brief GPIO initialization
- * @param ptx_n: pin number defined in common.h
- * @param dir: pin status (pull-up/pull-down, input/output, etc.)
- * @param data: pin output level 0: low level 1: high level
- */
-void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data);
-
-
-/* @brief Set IO direction
- * @param ptx_n: pin number defined in common.h
- * @param input: GPIO direction true: input false: output
- */
-void GPIO_PinSetDir(PTXn_e ptx_n, bool input);
-
-
-/* @brief Set IO port output
- * @param ptx_n: GPIO to be initialized, defined in common.h
- * @param data: 1: high level 0: low level
- */
-void GPIO_PinWrite(PTXn_e ptx_n, uint8_t data);
-
-
-/* @brief Flip IO port output
- * @param ptx_n: GPIO to be initialized, defined in common.h
- */
-void GPIO_PinReverse(PTXn_e ptx_n);
-
-
-/* @brief Get IO port level
- * @param ptx_n: GPIO to be initialized, defined in common.h
- * @return 0: low level 1: high level
- */
-uint8_t GPIO_PinRead(PTXn_e ptx_n);
-
-
-/* @brief IO pull-up
- * @param ptx_n select port
- * @param pullup_ena false: pulldown, true: pullup
- */
-void GPIO_PortPull(PTXn_e ptx_n, bool pullup_ena);
-
-
-/* @brief GPIO external interrupt initialization
- * @param ptx_n: GPIO to be initialized, defined in common.h
- * @param cfg: interrupt trigger mode, such as: rising_down // rising edge trigger, internal pull-down
- * @note Here only the peripheral interrupt is enabled, and NVIC_EnableIRQ() is also required to enable the kernel interrupt
- */
-void GPIO_ExtiInit(PTXn_e ptx_n, exti_cfg cfg);
-
 
 /* Bit operation macro definition */
 /* Define the port of PTA */
@@ -768,5 +716,105 @@ void GPIO_ExtiInit(PTXn_e ptx_n, exti_cfg cfg);
 /* Defines the 16-bit input port of PTE */
 #define PTE_WORD0_IN    PTE_BASE_PTR->PDIRWord.Word0
 #define PTE_WORD1_IN    PTE_BASE_PTR->PDIRWord.Word1
+
+//==============================================================================
+//                         PUBLIC GLOBAL VARIABLES
+//==============================================================================
+
+// Define pin status
+typedef enum GPIO_CFG
+{
+    // The value here cannot be changed!!!
+    GPI         = 0x00, // Define the pin input direction. In GPIOx_PDDRn, 0 means input and 1 means output.
+    GPO         = 0x01, // Define the pin output direction
+
+    GPI_DOWN    = 0x02, // Input pull-down PORTx_PCRn requires PE=1, PS=0
+    GPI_UP      = 0x03, // Input pull-up PORTx_PCRn requires PE=1, PS=1
+    GPI_PF      = 0x10, // Input, with passive filter, filter range: 10 MHz ~ 30 MHz. Does not support high-speed interface (>=2MHz) 0b10000           Passive Filter Enable
+    GPI_DOWN_PF = GPI_DOWN | GPI_PF ,       // Input pull-down with passive filter
+    GPI_UP_PF   = GPI_UP   | GPI_PF ,       // Input pull-up with passive filter
+
+    GPO_HDS     = 0x41, // Output high drive strength 0b100 0001 High drive strength
+    GPO_SSR     = 0x05, // Output slow change rate 0b101 Slow slew rate
+    GPO_HDS_SSR = GPO_HDS | GPO_SSR,    // Output high drive capability, slow change rate
+} GPIO_CFG;     // The lowest bit is 0, which means it is definitely input; the lowest bit of GPI_UP and GPI_UP_PF is 1, and the others are output
+
+
+// Define pin external interrupt trigger mode
+typedef enum exti_cfg
+{
+    rising_DMA      = 0x01,     // Rising edge triggers DMA interrupt
+    falling_DMA     = 0x02,     // Falling edge triggers DMA interrupt
+    either_down_DMA = 0x03,     // DMA interrupt triggered by edge transition
+
+    // Use the highest bit to mark pull-up and pull-down
+    zero_down       = 0x08u,    // Low level trigger, internal pull-down
+    rising_down     = 0x09u,    // Rising edge trigger, internal pull-down
+    falling_down    = 0x0Au,    // Falling edge triggered, internal pull-down
+    either_down     = 0x0Bu,    // Edge trigger, internal pull-down
+    one_down        = 0x0Cu,    // High level trigger, internal pull-down
+
+    // Use the highest bit to mark pull-up and pull-down
+    zero_up         = 0x88u,    // Low level trigger, internal pull-up
+    rising_up       = 0x89u,    // Rising edge trigger, internal pull-up
+    falling_up      = 0x8Au,    // Falling edge triggered, internal pull-up
+    either_up       = 0x8Bu,    // Edge trigger, internal pull-up
+    one_up          = 0x8Cu     // High level trigger, internal pull-up
+} exti_cfg;
+
+extern GPIO_MemMapPtr GPIOX[5];
+extern PORT_MemMapPtr PORTX[5];
+
+//==============================================================================
+//                        PUBLIC FUNCTION DECLARATIONS
+//==============================================================================
+/* @brief GPIO initialization
+ * @param ptx_n: pin number defined in common.h
+ * @param dir: pin status (pull-up/pull-down, input/output, etc.)
+ * @param data: pin output level 0: low level 1: high level
+ */
+void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data);
+
+
+/* @brief Set IO direction
+ * @param ptx_n: pin number defined in common.h
+ * @param input: GPIO direction true: input false: output
+ */
+void GPIO_PinSetDir(PTXn_e ptx_n, bool input);
+
+
+/* @brief Set IO port output
+ * @param ptx_n: GPIO to be initialized, defined in common.h
+ * @param data: 1: high level 0: low level
+ */
+void GPIO_PinWrite(PTXn_e ptx_n, uint8_t data);
+
+
+/* @brief Flip IO port output
+ * @param ptx_n: GPIO to be initialized, defined in common.h
+ */
+void GPIO_PinReverse(PTXn_e ptx_n);
+
+
+/* @brief Get IO port level
+ * @param ptx_n: GPIO to be initialized, defined in common.h
+ * @return 0: low level 1: high level
+ */
+uint8_t GPIO_PinRead(PTXn_e ptx_n);
+
+
+/* @brief IO pull-up
+ * @param ptx_n select port
+ * @param pullup_ena false: pulldown, true: pullup
+ */
+void GPIO_PortPull(PTXn_e ptx_n, bool pullup_ena);
+
+
+/* @brief GPIO external interrupt initialization
+ * @param ptx_n: GPIO to be initialized, defined in common.h
+ * @param cfg: interrupt trigger mode, such as: rising_down // rising edge trigger, internal pull-down
+ * @note Here only the peripheral interrupt is enabled, and NVIC_EnableIRQ() is also required to enable the kernel interrupt
+ */
+void GPIO_ExtiInit(PTXn_e ptx_n, exti_cfg cfg);
 
 #endif /* S32K_GPIO_H_ */
