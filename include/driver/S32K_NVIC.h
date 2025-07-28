@@ -1,15 +1,29 @@
 /*
  * =============================================================================
- * File Name    : include.h
+ * File Name    : S32K_NVIC.h
  * Project      : S32K144_basic
- * Module       :
+ * Module       : NVIC Configuration Module (Header)
  * Author       : JuaBue
- * Created On   : 2025-03-13>
+ * Created On   : 2025-07-28
  * Version      : 1.0.0
  *
  * Description  :
- *   This header file includes all the necessary header files for the project.
- *   It serves as a central point to manage includes in the project.
+ *   This header file provides definitions and a helper function for configuring
+ *   the interrupt priority grouping of the NVIC on the S32K144 microcontroller.
+ *   The module allows selecting among different preemption/subpriority groupings
+ *   as defined by the ARM Cortex-M architecture.
+ *
+ *   NVIC Group Settings:
+ *     - Group0: 0 bits preempt, 3 bits subpriority
+ *     - Group4: 4 bits preempt, 0 bits subpriority
+ *     - Others: intermediate combinations
+ *
+ * Dependencies :
+ *   - S32K register definitions
+ *   - include.h (project-level definitions)
+ *
+ * Configuration :
+ *   - Call `NVIC_setPriorityGroup()` during system startup
  *
  * License :
  *   This file is part of a free software project released under the terms of
@@ -26,38 +40,23 @@
  *
  * =============================================================================
  */
-#ifndef INCLUDE_H_
-#define INCLUDE_H_
 
+#ifndef DRIVER_S32K_NVIC_H_
+#define DRIVER_S32K_NVIC_H_
 //==============================================================================
 //                               INCLUDES
 //==============================================================================
-#include "common.h"
-#include "stdio.h"
-#include "math.h"
-#include "stdlib.h"
-
-#include "S32K144_features.h"
-#include "S32K144.h"
-
-#include "S32K_PLL.h"
-#include "S32K_UART.h"
-#include "S32K_GPIO.h"
-#include "S32K_SYSTICK.h"
-#include "S32K_WDOG.h"
-#include "S32K_NVIC.h"
-
-#include "LED.h"
-#include "KEY.h"
-#include "BUZZ.h"
+#include "include.h"
 
 //==============================================================================
 //                         PUBLIC DEFINES AND MACROS
 //==============================================================================
-
-//==============================================================================
-//                        PUBLIC TYPES AND ENUMERATIONS
-//==============================================================================
+/* Interrupt Priority Group */
+#define NVIC_Group0                    0x07
+#define NVIC_Group1                    0x06
+#define NVIC_Group2                    0x05
+#define NVIC_Group3                    0x04
+#define NVIC_Group4                    0x03
 
 //==============================================================================
 //                         PUBLIC GLOBAL VARIABLES
@@ -66,5 +65,6 @@
 //==============================================================================
 //                        PUBLIC FUNCTION DECLARATIONS
 //==============================================================================
+void NVIC_setPriorityGroup(uint32_t PriorityGroup);
 
-#endif /* INCLUDE_H_ */
+#endif /* DRIVER_S32K_NVIC_H_ */
