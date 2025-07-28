@@ -225,3 +225,39 @@ This module handles clock system setup for the **S32K144** microcontroller by NX
 - MCU SCG and SPLL register headers
 - Correct external clock hardware setup (8 MHz crystal)
 - Clock tree stability required for UART, timers, and peripherals
+
+## 7. NVIC Configuration Module
+
+This module provides an interface to configure the **interrupt priority grouping** of the **Nested Vectored Interrupt Controller (NVIC)** on the NXP **S32K144** microcontroller.
+
+### 7.0. Purpose
+
+The NVIC supports **grouped priorities**, splitting the 4 available priority bits between:
+
+- **Preemptive priority** (higher-level interrupts)
+- **Subpriority** (tie-breaking among equal preemptive levels)
+
+This module allows you to set the desired priority grouping before assigning individual interrupt priorities.
+
+### 7.1. Features
+
+- Defines 5 grouping macros:
+  - `NVIC_Group0` → 0 bits preempt / 4 bits subpriority
+  - `NVIC_Group1` → 1 bit preempt / 3 bits subpriority
+  - `NVIC_Group2` → 2 bits preempt / 2 bits subpriority
+  - `NVIC_Group3` → 3 bits preempt / 1 bit subpriority
+  - `NVIC_Group4` → 4 bits preempt / 0 bits subpriority
+- Configures grouping using SCB’s AIRCR register
+
+### 7.2. Function
+
+| Function                       | Description                                           |
+|--------------------------------|-------------------------------------------------------|
+| `NVIC_setPriorityGroup(group)` | Sets the global NVIC priority grouping configuration |
+
+> ⚠️ **Important:** Call this function **before** assigning individual IRQ priorities.
+
+### 7.3. Dependencies
+
+- S32K register definitions
+- Project include file `include.h`

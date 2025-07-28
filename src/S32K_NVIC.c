@@ -1,16 +1,29 @@
 /*
  * =============================================================================
- * File Name    : main.c
+ * File Name    : S32K_NVIC.c
  * Project      : S32K144_basic
- * Module       : Application Entry Point
+ * Module       : NVIC Configuration Module (Header)
  * Author       : JuaBue
- * Created On   : 2025-03-13
+ * Created On   : 2025-07-28
  * Version      : 1.0.0
  *
  * Description  :
- *   Entry point for testing and validating all modules within the S32K144_basic
- *   project. This file contains application-level code used to verify GPIO,
- *   LED, UART, KEY input, and PLL functionalities on the NXP S32K144 platform.
+ *   This header file provides definitions and a helper function for configuring
+ *   the interrupt priority grouping of the NVIC on the S32K144 microcontroller.
+ *   The module allows selecting among different preemption/subpriority groupings
+ *   as defined by the ARM Cortex-M architecture.
+ *
+ *   NVIC Group Settings:
+ *     - Group0: 0 bits preempt, 3 bits subpriority
+ *     - Group4: 4 bits preempt, 0 bits subpriority
+ *     - Others: intermediate combinations
+ *
+ * Dependencies :
+ *   - S32K register definitions
+ *   - include.h (project-level definitions)
+ *
+ * Configuration :
+ *   - Call `NVIC_setPriorityGroup()` during system startup
  *
  * License :
  *   This file is part of a free software project released under the terms of
@@ -27,15 +40,15 @@
  *
  * =============================================================================
  */
-
 //==============================================================================
 //                                INCLUDES
 //==============================================================================
-#include "include.h"
+#include "S32K_NVIC.h"
 
 //==============================================================================
 //                         LOCAL DEFINES AND MACROS
 //==============================================================================
+//Set the macro _DLIB_FILE_DESCRIPTOR (Options -> Compiler C/C++ -> Preprocessor)
 
 //==============================================================================
 //                       LOCAL TYPES AND ENUMERATIONS
@@ -56,60 +69,14 @@
 //==============================================================================
 //                       PUBLIC FUNCTION DEFINITIONS
 //==============================================================================
-void PORTD_IRQHandler()
+void NVIC_setPriorityGroup(uint32_t PriorityGroup)
 {
-    uint32_t temp = PORTD->ISFR;
-    PORTD->ISFR = 0xFFFFFFFF;
+    uint32_t reg_value;
 
-    /* PTD2 */
-    if (temp & (1 << 2)) {
-        LED_Reverse(3);
-    }
-    /* PTD3 */
-    else if (temp & (1 << 3)) {
-        LED_Reverse(6);
-        LED_Reverse(4);
-    }
-    /* PTD4 */
-    else if (temp & (1 << 4)) {
-        LED_Reverse(5);
-    }
-    else {
-        /* Do nothing */
-    }
+    reg_value = S32_SCB->AIRCR;
+    reg_value &= ~((S32_SCB_AIRCR_VECTKEY_MASK << S32_SCB_AIRCR_VECTKEY_SHIFT) |
+                   (S32_SCB_AIRCR_PRIGROUP_MASK << S32_SCB_AIRCR_VECTKEY_SHIFT));
+    reg_value = (reg_value | ((uint32_t)0x5FA << S32_SCB_AIRCR_VECTKEY_SHIFT) |
+                (PriorityGroup << 8U));
+    S32_SCB->AIRCR = reg_value;
 }
-
-int main(void)
-{
-    DisableInterrupts;
-    SPLL_Init(PLL160);
-    UART_Init(LPUART0, 115200);
-    NormalRUNmode_80MHz();
-
-    BUZZ_Init();
-    systime.init();
-
-    NVIC_setPriorityGroup(NVIC_Group2);
-
-    printf("---------------------------------------------\n");
-    printf("| Test of basic funtionalities with S32K144 |\n");
-    printf("---------------------------------------------\n");
-    EnableInterrupts;
-
-
-    /* Initial example to check the notes */
-    BUZZ_playNote('C', 150);
-    delay(1000);
-    BUZZ_playNote('E', 150);
-    delay(1000);
-
-    /* Play the song */
-    BUZZ_MainTask();
-
-    return 0;
-}
-
-//==============================================================================
-//                       STATIC FUNCTION DEFINITIONS
-//==============================================================================
-
