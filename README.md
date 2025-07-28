@@ -148,3 +148,42 @@ Before using this module:
 - Enable pull-up/down as needed depending on the configuration (`GPI_UP`, `GPI_DOWN`, etc.).
 - For interrupts, configure with `GPIO_ExtiInit()` and enable `NVIC_EnableIRQ()` separately.
 - Use the appropriate macros (`PTA0_OUT`, `DDRA0`, etc.) for direct bit/byte/word access where needed.
+
+## 5. UART Communication Module
+
+This module provides a lightweight interface for serial communication over the **LPUART** peripherals on the NXP **S32K144** microcontroller. It supports full-duplex transmission and reception for UART0, UART1, and UART2, with basic send/receive APIs for strings, characters, and buffers.
+
+### 5.0. Pin Configuration
+
+| UART    | TX Pin   | RX Pin   | Ports Available     |
+|---------|----------|----------|----------------------|
+| UART0   | `PTB1`   | `PTB0`   | Also PTA2/PTA3/PTC2/PTC3 |
+| UART1   | `PTC9`   | `PTC8`   | Also PTC6/PTC7/PTD13/PTD14 |
+| UART2   | `PTA9`   | `PTA8`   | Also PTD6/PTD7/PTD17/PTE12 |
+
+> 🔌 **Note:** Only one TX/RX pair per UART should be configured in the MUX settings at a time.
+
+### 5.1. Features
+
+- Supports 3 independent UART channels (LPUART0, 1, 2)
+- Send/receive data as:
+  - Single character
+  - Buffer of bytes
+  - Null-terminated strings
+- Fixed configuration: 8 data bits, 1 stop bit, no parity (8N1)
+- Dedicated initialization function for GPIO and peripheral
+- Clean abstraction layer over LPUART peripheral registers
+
+### 5.2. Dependencies
+
+- PLL system configuration via `S32K_PLL.h`
+- GPIO initialization for correct UART pin mapping
+- Clock configuration must be completed before UART use
+
+### 5.3. Configuration
+
+Before using this module:
+
+- Call `UART_PinInit(LPUARTx)` to configure the required TX/RX pins.
+- Call `UART_Init(LPUARTx, baud)` with the desired baud rate (e.g., 9600, 115200).
+- Ensure only the necessary UART MUX is active to avoid conflicts.
