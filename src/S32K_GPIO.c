@@ -1,16 +1,77 @@
 /*
- * S32K_GPIO.c
+ * =============================================================================
+ * File Name    : S32K_GPIO.c
+ * Project      : S32K144_basic
+ * Module       : GPIO Control Module (Header)
+ * Author       : JuaBue
+ * Created On   : 2025-03-30
+ * Version      : 1.0.0
  *
- *  Created on: 31 mar. 2025
- *      Author: Juan.Bueno
+ * Description  :
+ *   This header file provides enumerations, macros, and function declarations
+ *   for configuring and controlling GPIO ports on the NXP S32K144 microcontroller.
+ *   It supports flexible input/output settings, passive filters, pull-up/down
+ *   configurations, and interrupt trigger modes.
+ *
+ *   Main features:
+ *     - Configurable GPIO direction (input/output)
+ *     - Support for passive filters, pull-up/down resistors
+ *     - External interrupt trigger configuration (edge/level)
+ *     - Bit-level, byte-level, and word-level pin control
+ *     - Input/output direction configuration macros
+ *
+ * Dependencies :
+ *   - MCU register definitions for GPIOx and PORTx
+ *
+ * Configuration :
+ *   - Ensure that the system clock and GPIO modules are initialized prior to use
+ *
+ * License :
+ *   This file is part of a free software project released under the terms of
+ *   the GNU General Public License version 3 (GPLv3).
+ *
+ *   You are free to use, modify, and distribute this file under the conditions
+ *   of the GPLv3, as long as you retain this header and provide proper
+ *   attribution to the original author.
+ *
+ *   See <https://www.gnu.org/licenses/gpl-3.0.html> for the full license text.
+ *
+ *   Copyright (c) 2025 Juan I. Bueno
+ *   All rights reserved.
+ *
+ * =============================================================================
  */
-#include "include.h"
+//==============================================================================
+//                                INCLUDES
+//==============================================================================
 #include "S32K_GPIO.h"
 
+//==============================================================================
+//                         LOCAL DEFINES AND MACROS
+//==============================================================================
+
+//==============================================================================
+//                       LOCAL TYPES AND ENUMERATIONS
+//==============================================================================
+
+//==============================================================================
+//                           GLOBAL VARIABLES
+//==============================================================================
 /* Define five pointer arrays to save the address of GPIOX */
 GPIO_MemMapPtr GPIOX[5] = {PTA,    PTB,   PTC,   PTD,   PTE};
 PORT_MemMapPtr PORTX[5] = {PORTA,  PORTB, PORTC, PORTD, PORTE};
 
+//==============================================================================
+//                          STATIC VARIABLES
+//==============================================================================
+
+//==============================================================================
+//                      STATIC FUNCTION DECLARATIONS
+//==============================================================================
+
+//==============================================================================
+//                       PUBLIC FUNCTION DEFINITIONS
+//==============================================================================
 void GPIO_PinInit(PTXn_e ptx_n, GPIO_CFG dir, uint8_t data)
 {
     uint8_t ptx, ptn;

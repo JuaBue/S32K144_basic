@@ -1,15 +1,65 @@
 /*
- * S32K_UART.c
+ * =============================================================================
+ * File Name    : S32K_UART.c
+ * Project      : S32K144_basic
+ * Module       : UART Communication Module (Header)
+ * Author       : JuaBue
+ * Created On   : 2025-03-22
+ * Version      : 1.0.0
  *
- *  Created on: 23 mar. 2025
- *      Author: Juan.Bueno
+ * Description  :
+ *   This header file declares functions and macros for configuring and using
+ *   the UART (LPUART) peripherals of the NXP S32K144 microcontroller. It supports
+ *   initialization, data transmission, and reception through UART0, UART1, and
+ *   UART2.
+ *
+ *   UART pin mappings:
+ *     - UART0_RX : PTB0   | UART0_TX : PTB1
+ *     - UART1_RX : PTC8   | UART1_TX : PTC9
+ *     - UART2_RX : PTA8   | UART2_TX : PTA9
+ *
+ *   All UARTs operate with 8 data bits, 1 stop bit, and no parity (8N1).
+ *
+ * Dependencies :
+ *   - GPIO configuration (via UART_PinInit)
+ *   - PLL configuration (via S32K_PLL.h)
+ *
+ * Configuration :
+ *   - Baud rate must be passed by the user
+ *   - Ensure system clock and PLL are configured before UART_Init()
+ *
+ * License :
+ *   This file is part of a free software project released under the terms of
+ *   the GNU General Public License version 3 (GPLv3).
+ *
+ *   You are free to use, modify, and distribute this file under the conditions
+ *   of the GPLv3, as long as you retain this header and provide proper
+ *   attribution to the original author.
+ *
+ *   See <https://www.gnu.org/licenses/gpl-3.0.html> for the full license text.
+ *
+ *   Copyright (c) 2025 Juan I. Bueno
+ *   All rights reserved.
+ *
+ * =============================================================================
  */
-
-#include "include.h"
+//==============================================================================
+//                                INCLUDES
+//==============================================================================
 #include "S32K_UART.h"
 
+//==============================================================================
+//                         LOCAL DEFINES AND MACROS
+//==============================================================================
 //Set the macro _DLIB_FILE_DESCRIPTOR (Options -> Compiler C/C++ -> Preprocessor)
 
+//==============================================================================
+//                       LOCAL TYPES AND ENUMERATIONS
+//==============================================================================
+
+//==============================================================================
+//                           GLOBAL VARIABLES
+//==============================================================================
 #if 1
 // #pragma import(__use_no_semihosting)
 // Support functions required by the standard library
@@ -19,6 +69,20 @@ struct __FILE
 };
 
 FILE __stdout;
+#endif
+
+//==============================================================================
+//                          STATIC VARIABLES
+//==============================================================================
+
+//==============================================================================
+//                      STATIC FUNCTION DECLARATIONS
+//==============================================================================
+
+//==============================================================================
+//                       PUBLIC FUNCTION DEFINITIONS
+//==============================================================================
+#if 1
 //define _sys_exit() to avoid mode semihost
 void _sys_exit(int x)
 {
@@ -29,7 +93,6 @@ int _write(int iFileHandle, char *pcBuffer, int iLength) {
     UART_PutBuff(LPUART0, (uint8_t *) pcBuffer, (uint32_t)iLength);
     return 0;
 }
-
 #endif
 
 
