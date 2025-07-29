@@ -69,7 +69,7 @@
 //==============================================================================
 //                       PUBLIC FUNCTION DEFINITIONS
 //==============================================================================
-void NVIC_setPriorityGroup(uint32_t PriorityGroup)
+void NVIC_SetPriorityGrouping(uint32_t PriorityGroup)
 {
     uint32_t reg_value;
 

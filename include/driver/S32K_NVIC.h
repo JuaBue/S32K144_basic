@@ -65,6 +65,10 @@
 //==============================================================================
 //                        PUBLIC FUNCTION DECLARATIONS
 //==============================================================================
-void NVIC_setPriorityGroup(uint32_t PriorityGroup);
+/*
+ * @brief: Set Priority Grouping
+ * @param: PriorityGroup: Priority grouping field
+ */
+void NVIC_SetPriorityGrouping(uint32_t PriorityGroup);
 
 #endif /* DRIVER_S32K_NVIC_H_ */
