@@ -58,6 +58,9 @@
 #define NVIC_Group3                    0x04
 #define NVIC_Group4                    0x03
 
+/* S32K144 has 4 bits for priority */
+#define NVIC_PI_BITS                   4U
+
 //==============================================================================
 //                         PUBLIC GLOBAL VARIABLES
 //==============================================================================
@@ -70,5 +73,7 @@
  * @param: PriorityGroup: Priority grouping field
  */
 void NVIC_SetPriorityGrouping(uint32_t PriorityGroup);
+
+
 
 #endif /* DRIVER_S32K_NVIC_H_ */

@@ -55,7 +55,6 @@
 #define KEY_NOPRESS                    1U
 #define KEY_PRESS                      0U
 
-#define NUM_PI_BITS                    4U // S32K144 has 4 bits for priority
 #define PREEM_PI_VALUE                 1U
 #define SUB_PI_VALUE                   2U
 
@@ -175,13 +174,13 @@ void Test_KEYint(void)
     priorityGroup = ((S32_SCB->AIRCR & S32_SCB_AIRCR_PRIGROUP_MASK) >> S32_SCB_AIRCR_PRIGROUP_SHIFT);
 
     /* Maximum value for PRIGROUP */
-    if (priorityGroup > NUM_PI_BITS) {
-        priorityGroup = NUM_PI_BITS;
+    if (priorityGroup > NVIC_PI_BITS) {
+        priorityGroup = NVIC_PI_BITS;
     }
 
     /* Set the number of bits for every field */
     preemptPriorityBits = priorityGroup;
-    subPriorityBits = NUM_PI_BITS - priorityGroup;
+    subPriorityBits = NVIC_PI_BITS - priorityGroup;
 
     /* Set mask to avoid overload */
     preemptPriority &= ((1U << preemptPriorityBits) - 1U);
@@ -191,7 +190,7 @@ void Test_KEYint(void)
     priority = (preemptPriority << subPriorityBits) | subPriority;
 
     /* Set Priority for device specific Interrupts */
-    S32_NVIC->IP[(uint32_t)PORTD_IRQn] = ((priority << (8U - NUM_PI_BITS)) & 0xFF);
+    S32_NVIC->IP[(uint32_t)PORTD_IRQn] = ((priority << (8U - NVIC_PI_BITS)) & 0xFF);
 
     /* Enable interrupt for PORTD_IRQn */
     S32_NVIC->ISER[(uint32_t)(PORTD_IRQn) >> 5] = (1U << ((uint32_t)(PORTD_IRQn) & 0x1F));
