@@ -58,6 +58,9 @@
 #define NVIC_Group3                    0x04
 #define NVIC_Group4                    0x03
 
+/* S32K144 has 4 bits for priority */
+#define NVIC_PI_BITS                   4U
+
 //==============================================================================
 //                         PUBLIC GLOBAL VARIABLES
 //==============================================================================
@@ -65,6 +68,52 @@
 //==============================================================================
 //                        PUBLIC FUNCTION DECLARATIONS
 //==============================================================================
-void NVIC_setPriorityGroup(uint32_t PriorityGroup);
+/*
+ * @brief: Set Priority Grouping
+ * @param: PriorityGroup: Priority grouping field
+ */
+void NVIC_SetPriorityGrouping(uint32_t PriorityGroup);
+
+/*
+ * @brief: Get Priority Grouping
+ * @return: Priority grouping field
+ */
+uint32_t NVIC_GetPriorityGrouping(void);
+
+/*
+ * @brief: Set Interrupt Priority
+ * @param: IRQn: Number of the interrupt for set priority
+ * @param: priority: Priority to set
+ */
+void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority);
+
+/*
+ * @brief: Set Interrupt Priority
+ * @param: IRQn: Number of the interrupt for get priority
+ * @return: Interrupt Priority
+ */
+uint32_t NVIC_GetPriority(IRQn_Type IRQn);
+
+/*
+ * @brief: Enable External Interrupt
+ * @param: IRQn: Number of the external interrupt to enable
+ */
+void NVIC_EnableIRQ(IRQn_Type IRQn);
+
+/*
+ * @brief: Disable External Interrupt
+ * @param: IRQn: Number of the external interrupt to disable
+ */
+void NVIC_DisableIRQ(IRQn_Type IRQn);
+
+/*
+ * @brief: Encode Priority
+ * @param: PriorityGroup: Used priority group
+ * @param: PreemptPriority: Preemptive priority value (starting from 0)
+ * @param: SubPriority: Number of the interrupt for get priority
+ * @return: Encoded priority for the interrupt
+ */
+uint32_t NVIC_EncodePriority (uint32_t PriorityGroup, uint32_t PreemptPriority,
+                              uint32_t SubPriority);
 
 #endif /* DRIVER_S32K_NVIC_H_ */

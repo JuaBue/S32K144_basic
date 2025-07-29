@@ -55,7 +55,6 @@
 #define KEY_NOPRESS                    1U
 #define KEY_PRESS                      0U
 
-#define NUM_PI_BITS                    4U // S32K144 has 4 bits for priority
 #define PREEM_PI_VALUE                 1U
 #define SUB_PI_VALUE                   2U
 
@@ -158,10 +157,6 @@ void Test_KEYint(void)
 {
     uint32_t priority;
     uint32_t priorityGroup;
-    uint32_t preemptPriority = PREEM_PI_VALUE;
-    uint32_t preemptPriorityBits;
-    uint32_t subPriority = SUB_PI_VALUE;
-    uint32_t subPriorityBits;
 
     /* Initialize LED module */
     LED_Init();
@@ -172,29 +167,16 @@ void Test_KEYint(void)
     GPIO_ExtiInit(KEYC_IO, falling_up);
 
     /* Priority Configuration:  */
-    priorityGroup = ((S32_SCB->AIRCR & S32_SCB_AIRCR_PRIGROUP_MASK) >> S32_SCB_AIRCR_PRIGROUP_SHIFT);
-
-    /* Maximum value for PRIGROUP */
-    if (priorityGroup > NUM_PI_BITS) {
-        priorityGroup = NUM_PI_BITS;
-    }
-
-    /* Set the number of bits for every field */
-    preemptPriorityBits = priorityGroup;
-    subPriorityBits = NUM_PI_BITS - priorityGroup;
-
-    /* Set mask to avoid overload */
-    preemptPriority &= ((1U << preemptPriorityBits) - 1U);
-    subPriority &= ((1U << subPriorityBits) - 1U);
+    priorityGroup = NVIC_GetPriorityGrouping();
 
     /* Encode priority */
-    priority = (preemptPriority << subPriorityBits) | subPriority;
+    priority = NVIC_EncodePriority(priorityGroup, PREEM_PI_VALUE, SUB_PI_VALUE);
 
     /* Set Priority for device specific Interrupts */
-    S32_NVIC->IP[(uint32_t)PORTD_IRQn] = ((priority << (8U - NUM_PI_BITS)) & 0xFF);
+    NVIC_SetPriority(PORTD_IRQn, priority);
 
     /* Enable interrupt for PORTD_IRQn */
-    S32_NVIC->ISER[(uint32_t)(PORTD_IRQn) >> 5] = (1U << ((uint32_t)(PORTD_IRQn) & 0x1F));
+    NVIC_EnableIRQ(PORTD_IRQn);
 
     /* Infinite loop */
     while(1);

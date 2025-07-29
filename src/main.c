@@ -89,7 +89,7 @@ int main(void)
     BUZZ_Init();
     systime.init();
 
-    NVIC_setPriorityGroup(NVIC_Group2);
+    NVIC_SetPriorityGrouping(NVIC_Group2);
 
     printf("---------------------------------------------\n");
     printf("| Test of basic funtionalities with S32K144 |\n");

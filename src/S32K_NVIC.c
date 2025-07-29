@@ -69,7 +69,7 @@
 //==============================================================================
 //                       PUBLIC FUNCTION DEFINITIONS
 //==============================================================================
-void NVIC_setPriorityGroup(uint32_t PriorityGroup)
+void NVIC_SetPriorityGrouping(uint32_t PriorityGroup)
 {
     uint32_t reg_value;
 
@@ -79,4 +79,58 @@ void NVIC_setPriorityGroup(uint32_t PriorityGroup)
     reg_value = (reg_value | ((uint32_t)0x5FA << S32_SCB_AIRCR_VECTKEY_SHIFT) |
                 (PriorityGroup << 8U));
     S32_SCB->AIRCR = reg_value;
+}
+
+uint32_t NVIC_GetPriorityGrouping(void)
+{
+    return ((S32_SCB->AIRCR & S32_SCB_AIRCR_PRIGROUP_MASK) >> S32_SCB_AIRCR_PRIGROUP_SHIFT);
+}
+
+void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+{
+    S32_NVIC->IP[(uint32_t)IRQn] = ((priority << (8U - NVIC_PI_BITS)) & 0xFF);
+}
+
+uint32_t NVIC_GetPriority(IRQn_Type IRQn)
+{
+    return (S32_NVIC->IP[(uint32_t)IRQn] >> (8U - NVIC_PI_BITS));
+}
+
+void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+    S32_NVIC->ISER[(uint32_t)(IRQn) >> 5] = (1U << ((uint32_t)(IRQn) & 0x1F));
+}
+
+void NVIC_DisableIRQ(IRQn_Type IRQn)
+{
+    S32_NVIC->ICER[(uint32_t)(IRQn) >> 5] = (1U << ((uint32_t)(IRQn) & 0x1F));
+}
+
+uint32_t NVIC_EncodePriority (uint32_t PriorityGroup, uint32_t PreemptPriority,
+                              uint32_t SubPriority)
+{
+    uint32_t preemptPriority = PreemptPriority;
+    uint32_t subPriority = SubPriority;
+    uint32_t priorityGroup = PriorityGroup;
+    uint32_t preemptPriorityBits;
+    uint32_t subPriorityBits;
+
+    /* Maximum value for PRIGROUP */
+    if (priorityGroup > NVIC_PI_BITS) {
+        priorityGroup = NVIC_PI_BITS;
+    }
+
+    /* Set the number of bits for every field */
+    preemptPriorityBits = priorityGroup;
+    subPriorityBits = NVIC_PI_BITS - priorityGroup;
+
+    /* Set the number of bits for every field */
+    preemptPriorityBits = priorityGroup;
+    subPriorityBits = NVIC_PI_BITS - priorityGroup;
+
+    /* Set mask to avoid overload */
+    preemptPriority &= ((1U << preemptPriorityBits) - 1U);
+    subPriority &= ((1U << subPriorityBits) - 1U);
+
+    return ((preemptPriority << subPriorityBits) | subPriority);
 }
